@@ -16,7 +16,7 @@ public class Copy {
             return;
         }
 
-        Path inputPath = Paths.get(args[0]);
+        Path inputPath = Paths.get(args[0]).toAbsolutePath();
 
         if (!Files.exists(inputPath)) {
             System.out.println("input path is not exists");
@@ -27,8 +27,8 @@ public class Copy {
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS-")) + inputPath.getFileName());
 
         if (Files.isDirectory(inputPath)) {
-            final String inputAbsolutePath = inputPath.toAbsolutePath().toString();
-            final String outputAbsolutePath = outputFilePath.toAbsolutePath().toString();
+            final String inputAbsolutePath = inputPath.toString();
+            final String outputAbsolutePath = outputFilePath.toString();
 
             final List<Path> visitFileFailedList = new LinkedList<>();
             final List<Path> createDirectoryList = new LinkedList<>();
@@ -68,7 +68,7 @@ public class Copy {
             visitFileFailedList.forEach(System.out::println);
         } else {
             Files.copy(inputPath, outputFilePath);
-            System.out.println("create file : " + outputFilePath.toAbsolutePath());
+            System.out.println("create file : " + outputFilePath);
         }
 
         System.out.println("finish");
