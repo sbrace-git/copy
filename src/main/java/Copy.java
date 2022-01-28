@@ -28,9 +28,9 @@ public class Copy {
 
         if (Files.isDirectory(inputPath)) {
 
-            final List<Path> visitFileFailedList = new LinkedList<>();
             final List<Path> createDirectoryList = new LinkedList<>();
             final List<Path> createFileList = new LinkedList<>();
+            final List<Path> visitFileFailedList = new LinkedList<>();
 
             final Pattern pattern = Pattern.compile(inputPath.toString(), Pattern.LITERAL);
             final String quoteReplacement = Matcher.quoteReplacement(outputFilePath.toString());
@@ -54,6 +54,8 @@ public class Copy {
 
                 @Override
                 public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                    System.err.println("visit file failed path = " + file);
+                    exc.printStackTrace();
                     visitFileFailedList.add(file);
                     return FileVisitResult.CONTINUE;
                 }
@@ -76,7 +78,7 @@ public class Copy {
             createFileList.forEach(System.out::println);
 
             System.out.println("visit file failed count = " + visitFileFailedList.size());
-            visitFileFailedList.forEach(System.out::println);
+            visitFileFailedList.forEach(System.err::println);
         } else {
             Files.copy(inputPath, outputFilePath);
             System.out.println("create file : " + outputFilePath);
