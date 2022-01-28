@@ -18,7 +18,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>src.main.java.Copy</mainClass>
+                            <mainClass>Copy</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
