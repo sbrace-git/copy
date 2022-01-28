@@ -6,6 +6,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Copy {
 
@@ -27,17 +29,18 @@ public class Copy {
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS-")) + inputPath.getFileName());
 
         if (Files.isDirectory(inputPath)) {
-            final String inputAbsolutePath = inputPath.toString();
-            final String outputAbsolutePath = outputFilePath.toString();
 
             final List<Path> visitFileFailedList = new LinkedList<>();
             final List<Path> createDirectoryList = new LinkedList<>();
             final List<Path> createFileList = new LinkedList<>();
 
+            final Pattern pattern = Pattern.compile(inputPath.toString(), Pattern.LITERAL);
+            final String quoteReplacement = Matcher.quoteReplacement(outputFilePath.toString());
+
             Files.walkFileTree(inputPath, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    Path directoryPath = Paths.get(dir.toString().replace(inputAbsolutePath, outputAbsolutePath));
+                    Path directoryPath = getTargetPath(dir);
                     Files.createDirectories(directoryPath);
                     createDirectoryList.add(directoryPath);
                     return FileVisitResult.CONTINUE;
@@ -45,7 +48,7 @@ public class Copy {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Path filePath = Paths.get(file.toString().replace(inputAbsolutePath, outputAbsolutePath));
+                    Path filePath = getTargetPath(file);
                     Files.copy(file, filePath);
                     createFileList.add(filePath);
                     return FileVisitResult.CONTINUE;
@@ -55,6 +58,16 @@ public class Copy {
                 public FileVisitResult visitFileFailed(Path file, IOException exc) {
                     visitFileFailedList.add(file);
                     return FileVisitResult.CONTINUE;
+                }
+
+                /**
+                 * build a path to the target
+                 * @param path
+                 *        the path to the file to copy
+                 * @return the path to the target
+                 */
+                private Path getTargetPath(Path path) {
+                    return Paths.get(pattern.matcher(path.toString()).replaceFirst(quoteReplacement));
                 }
             });
 
