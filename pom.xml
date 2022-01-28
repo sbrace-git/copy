@@ -7,7 +7,7 @@
 
     <groupId>copy</groupId>
     <artifactId>copy</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <build>
         <plugins>
