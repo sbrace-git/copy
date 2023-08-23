@@ -1,4 +1,4 @@
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
@@ -9,14 +9,23 @@ import java.util.regex.Pattern;
 
 public class Copy {
 
+    private static boolean encrypt = false;
+
     public static void main(String[] args) throws IOException {
         System.out.println("params = " + Arrays.toString(args));
+
+
         if (args.length == 0) {
             System.out.println("input path is required");
             return;
+        } else if (args.length > 1) {
+            String encryptParam = args[0];
+            if ("e".equalsIgnoreCase(encryptParam)) {
+                encrypt = true;
+            }
         }
 
-        Path inputPath = Paths.get(args[0]).toAbsolutePath();
+        Path inputPath = Paths.get(args[args.length - 1]).toAbsolutePath();
 
         if (!Files.exists(inputPath)) {
             System.out.println("input path is not exists");
@@ -80,7 +89,23 @@ public class Copy {
             System.out.println("visit file failed count = " + visitFileFailedList.size());
             visitFileFailedList.forEach(System.err::println);
         } else {
-            Files.copy(inputPath, outputFilePath);
+            if (encrypt) {
+                try (
+                        FileInputStream fileInputStream = new FileInputStream(inputPath.toFile());
+                        BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+                        FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath.toFile());
+                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+                ) {
+                    int n;
+                    while ((n = bufferedInputStream.read()) != -1) {
+                        bufferedOutputStream.write(255 - n);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Files.copy(inputPath, outputFilePath);
+            }
             System.out.println("create file : " + outputFilePath);
         }
 
