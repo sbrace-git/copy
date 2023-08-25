@@ -1,3 +1,5 @@
+import org.apache.commons.cli.*;
+
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -8,10 +10,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Copy {
+    private static boolean OPT_ENCRYPT = false;
 
-    private static boolean encrypt = false;
+    public static void main(String[] args) throws IOException, ParseException {
+        Option optEncrypt = Option.builder("e")
+                .longOpt("encrypt")
+                .desc("encrypt file")
+                .hasArg()
+                .build();
+        Option optPath = Option.builder()
+                .desc("file or directory path")
+                .required()
+                .hasArgs()
+                .build();
+        Options options = new Options();
+        options.addOption(optEncrypt);
+        DefaultParser defaultParser = new DefaultParser();
+        CommandLine commandLine = defaultParser.parse(options, args);
+        OPT_ENCRYPT = commandLine.hasOption(optEncrypt);
 
-    public static void main(String[] args) throws IOException {
         System.out.println("params = " + Arrays.toString(args));
 
 
@@ -21,7 +38,7 @@ public class Copy {
         } else if (args.length > 1) {
             String encryptParam = args[0];
             if ("e".equalsIgnoreCase(encryptParam)) {
-                encrypt = true;
+                OPT_ENCRYPT = true;
             }
         }
 
@@ -89,7 +106,7 @@ public class Copy {
             System.out.println("visit file failed count = " + visitFileFailedList.size());
             visitFileFailedList.forEach(System.err::println);
         } else {
-            if (encrypt) {
+            if (OPT_ENCRYPT) {
                 try (
                         FileInputStream fileInputStream = new FileInputStream(inputPath.toFile());
                         BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
