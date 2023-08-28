@@ -29,8 +29,7 @@ public class Copy {
             System.err.println("require ONE path");
             return;
         }
-        System.out.printf("path = %s%n", commandLinArgs[0]);
-        System.out.println(commandLinArgs[0]);
+        System.out.println("path = " + commandLinArgs[0]);
 
         final Path inputPath = Paths.get(args[args.length - 1]).toAbsolutePath();
 
