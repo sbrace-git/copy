@@ -13,43 +13,33 @@ public class Copy {
     private static boolean OPT_ENCRYPT = false;
 
     public static void main(String[] args) throws IOException, ParseException {
-        Option optEncrypt = Option.builder("e")
+        final Option optEncrypt = Option.builder("e")
                 .longOpt("encrypt")
                 .desc("encrypt file")
-                .hasArg()
                 .build();
-        Option optPath = Option.builder()
-                .desc("file or directory path")
-                .required()
-                .hasArgs()
-                .build();
-        Options options = new Options();
+        final Options options = new Options();
         options.addOption(optEncrypt);
-        DefaultParser defaultParser = new DefaultParser();
-        CommandLine commandLine = defaultParser.parse(options, args);
+        final DefaultParser defaultParser = new DefaultParser();
+        final CommandLine commandLine = defaultParser.parse(options, args);
         OPT_ENCRYPT = commandLine.hasOption(optEncrypt);
 
         System.out.println("params = " + Arrays.toString(args));
-
-
-        if (args.length == 0) {
-            System.out.println("input path is required");
+        final String[] commandLinArgs = commandLine.getArgs();
+        if (commandLinArgs.length != 1) {
+            System.err.println("require ONE path");
             return;
-        } else if (args.length > 1) {
-            String encryptParam = args[0];
-            if ("e".equalsIgnoreCase(encryptParam)) {
-                OPT_ENCRYPT = true;
-            }
         }
+        System.out.printf("path = %s%n", commandLinArgs[0]);
+        System.out.println(commandLinArgs[0]);
 
-        Path inputPath = Paths.get(args[args.length - 1]).toAbsolutePath();
+        final Path inputPath = Paths.get(args[args.length - 1]).toAbsolutePath();
 
         if (!Files.exists(inputPath)) {
             System.out.println("input path is not exists");
             return;
         }
 
-        Path outputFilePath = inputPath.getParent().resolve(LocalDateTime.now()
+        final Path outputFilePath = inputPath.getParent().resolve(LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-SSS-")) + inputPath.getFileName());
 
         if (Files.isDirectory(inputPath)) {
@@ -64,7 +54,7 @@ public class Copy {
             Files.walkFileTree(inputPath, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    Path directoryPath = getTargetPath(dir);
+                    final Path directoryPath = getTargetPath(dir);
                     Files.createDirectories(directoryPath);
                     createDirectoryList.add(directoryPath);
                     return FileVisitResult.CONTINUE;
@@ -72,7 +62,7 @@ public class Copy {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Path filePath = getTargetPath(file);
+                    final Path filePath = getTargetPath(file);
                     Files.copy(file, filePath);
                     createFileList.add(filePath);
                     return FileVisitResult.CONTINUE;
@@ -108,10 +98,10 @@ public class Copy {
         } else {
             if (OPT_ENCRYPT) {
                 try (
-                        FileInputStream fileInputStream = new FileInputStream(inputPath.toFile());
-                        BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
-                        FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath.toFile());
-                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+                        final FileInputStream fileInputStream = new FileInputStream(inputPath.toFile());
+                        final BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+                        final FileOutputStream fileOutputStream = new FileOutputStream(outputFilePath.toFile());
+                        final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                 ) {
                     int n;
                     while ((n = bufferedInputStream.read()) != -1) {
