@@ -7,7 +7,7 @@
 
     <groupId>copy</groupId>
     <artifactId>copy</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
