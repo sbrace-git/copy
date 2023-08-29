@@ -9,7 +9,7 @@
 ## Usage
 - download or build release copy-1.3.jar
 - install JRE 8+
-- `java -jar copy-1.3.jar [path]`
+- `java -jar copy-1.3.jar [<options>] <path>`
 ## Examples
 ### copy
 - `java -jar copy-1.3.jar fileName.suffix`
